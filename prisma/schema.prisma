@@ -53,6 +53,7 @@ model User {
   admin                  Admin?
   author                 Author?
   moderator              Moderator?
+  like                   Like[]
 
   @@map("users")
 }
@@ -116,6 +117,7 @@ model Blog {
   id         String     @id @default(uuid())
   title      String
   content    String
+  category   String?
   image      String?
   authorId   String
   author     Author     @relation(fields: [authorId], references: [id])
@@ -137,6 +139,20 @@ model Comment {
   blog      Blog     @relation(fields: [blogId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  like      Like[]
 
   @@map("comments")
+}
+
+model Like {
+  id String @id @default(uuid())
+
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("likes")
 }

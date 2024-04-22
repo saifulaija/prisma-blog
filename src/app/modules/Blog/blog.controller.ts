@@ -6,6 +6,10 @@ import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
 import { blogServicres } from './blog.service';
 import { VerifiedUser } from '../../interfaces/common';
+import { filterValidQueryParams } from '../../../shared/filterValidQueryParams';
+
+import { paginationAndSortingParams } from '../../../shared/appConstants';
+import { blogValidParams } from './blog.constant';
 
 const createBlog = catchAsync(async (req: Request& {user?:any}, res: Response) => {
    const user =req.user
@@ -21,6 +25,28 @@ const createBlog = catchAsync(async (req: Request& {user?:any}, res: Response) =
    });
 });
 
+const getAllBlogs = catchAsync(async (req: Request, res: Response) => {
+   const validQueryParams = filterValidQueryParams(req.query, blogValidParams);
+   const paginationAndSortingQueryParams = filterValidQueryParams(
+      req.query,
+      paginationAndSortingParams
+   );
+
+   const result = await blogServicres.getAllBlogFomDB(
+      validQueryParams,
+      paginationAndSortingQueryParams
+   );
+
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Blog data fetched successfully!',
+      meta: result.meta,
+      data: result.result,
+   });
+});
+
+
 export const blogController = {
-   createBlog,
+   createBlog,getAllBlogs
 };
