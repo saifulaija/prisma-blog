@@ -130,9 +130,9 @@ model Blog {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String
-  likes     Int?     @default(0)
+  id      String @id @default(uuid())
+  content String
+
   authorId  String
   author    Author   @relation(fields: [authorId], references: [id])
   blogId    String

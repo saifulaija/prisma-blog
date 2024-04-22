@@ -11,7 +11,7 @@ import { validateRequest } from "../../middlewares/validateRequest";
 const router = express.Router();
 router.get(
   "/",
-  // authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
+  authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
   blogController.getAllBlogs
 );
 
@@ -42,7 +42,7 @@ router.delete(
 
 router.patch(
   "/update-blog/:id",
-  authGuard(UserRole.MODERATOR,UserRole.BLOGGER),
+  authGuard(UserRole.MODERATOR,UserRole.BLOGGER,UserRole.ADMIN,UserRole.SUPER_ADMIN),
   validateRequest(blogValidationSchema.updateBlog),
   blogController.updateBlog
 );

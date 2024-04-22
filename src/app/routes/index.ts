@@ -5,6 +5,7 @@ import { userRoutes } from '../modules/User/user.routes';
 import { AdminRoutes } from '../modules/Admin/admin.routes';
 import { blogRoutes } from '../modules/Blog/blog.routes';
 import { AuthorRoutes } from '../modules/Author/author.routes';
+import { ModeratorRoutes } from '../modules/Moderator/moderator.routes';
 
 const router = express.Router();
 
@@ -20,6 +21,10 @@ const moduleRoutes = [
    {
       path: '/author',
       route: AuthorRoutes,
+   },
+   {
+      path: '/moderator',
+      route: ModeratorRoutes,
    },
    {
       path: '/auth',
