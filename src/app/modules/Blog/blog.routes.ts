@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 
 import authGuard from "../../middlewares/authGuard";
 import { UserRole } from "@prisma/client";
-import { fileUploader } from "../../../helpers/fileUploader";
+// import { fileUploader } from "../../../helpers/fileUploader";
 import { blogValidationSchema } from "./blog.validation";
 import { blogController } from "./blog.controller";
 
@@ -17,6 +17,7 @@ router.post(
 
 //     return blogController.createBlog(req, res, next);
 //   }
+authGuard(UserRole.BLOGGER),
 blogController.createBlog
 );
 
