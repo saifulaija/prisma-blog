@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const createBlogSchema = z.object({
+const createBlog = z.object({
   body:z.object({
     id: z.string(),
     title: z.string(),
@@ -13,6 +13,18 @@ const createBlogSchema = z.object({
   })
 });
 
+
+const updateBlog = z.object({
+   body: z.object({
+    title: z.string().optional(),
+    content: z.string().optional(),
+    category:z.string().optional()
+   }),
+});
+
+
+
+
 export const blogValidationSchema = {
-   createBlogSchema
+   createBlog,updateBlog
 };
