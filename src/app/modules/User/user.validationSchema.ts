@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // const createAdminSchema = z.object({
 //    password: z.string({ required_error: 'Password is required' }),
@@ -10,15 +10,20 @@ import { z } from 'zod';
 // });
 
 const createAdminSchema = z.object({
-   body:z.object({
+  body: z.object({
     password: z.string(),
-     email: z.string().email(),
-     name: z.string(),
-     contactNumber: z.string()
-   })
-  
+    email: z.string().email(),
+    name: z.string(),
+    contactNumber: z.string(),
+  }),
+});
+
+const userUpdateStatus = z.object({
+   body: z.object({
+     status: z.enum([ 'ACTIVE', 'BLOCKED','DELETED']),
+   }),
  });
 
 export const userValidationSchema = {
-   createAdminSchema,
+  createAdminSchema,userUpdateStatus
 };

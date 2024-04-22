@@ -12,6 +12,8 @@ import {
   ISortingParams,
 } from "../../interfaces/paginationSorting";
 import { IUserFilterParams } from "./user.interface";
+import { HTTPError } from "../../errors/HTTPError";
+import httpStatus from "http-status";
 
 const createAdmin = async (payload: any) => {
   const { password, ...admin } = payload;
@@ -190,10 +192,30 @@ const updateMyProfile = async (authUser: any, payload: any) => {
   return { ...profileData, ...userData };
 };
 
+const changeProfileStatus = async (userId: string, status: UserStatus) => {
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+  if (!isUserExist) {
+    throw new HTTPError(httpStatus.BAD_REQUEST, 'User does not exists!');
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: status,
+  });
+
+  return updatedUser;
+};
 export const userServices = {
   createAdmin,
   createAuthor,
   getAllUsersFromDb,
   getMyProfile,
   updateMyProfile,
+  changeProfileStatus
 };

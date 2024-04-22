@@ -4,6 +4,8 @@ import authGuard from "../../middlewares/authGuard";
 import { UserRole } from "@prisma/client";
 
 import { userController } from "./user.controller";
+import { validateRequest } from "../../middlewares/validateRequest";
+import { userValidationSchema } from "./user.validationSchema";
 
 
 
@@ -20,6 +22,12 @@ router.patch(
   authGuard(UserRole.ADMIN,UserRole.BLOGGER,UserRole.MODERATOR,UserRole.SUPER_ADMIN),
   userController.updateMyProfile
 
+);
+router.patch(
+  '/:id/status',
+  authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
+  validateRequest(userValidationSchema.userUpdateStatus),
+  userController.changeProfileStatus,
 );
 
 router.post(
