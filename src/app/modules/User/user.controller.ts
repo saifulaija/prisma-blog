@@ -51,8 +51,39 @@ const getAllUsers = catchAsync(
   }
 );
 
+
+const getMyProfile = catchAsync(async (req: Request & {user?:any}, res: Response) => {
+  const user = req.user;
+
+  const result = await userServices.getMyProfile(user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Profile data fetched!',
+    data: result
+  });
+});
+
+const updateMyProfile = catchAsync(async (req: Request &{user?:any}, res: Response) => {
+  const user = req.user;
+  
+  console.log()
+
+  const result = await userServices.updateMyProfile(user,req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Profile updated successfully!!',
+    data: result
+  });
+});
+
 export const userController = {
   createAdmin,
   createAuthor,
   getAllUsers,
+  getMyProfile,
+  updateMyProfile
 };

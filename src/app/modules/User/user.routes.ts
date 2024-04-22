@@ -3,13 +3,24 @@ import express, { Request, Response, NextFunction } from "express";
 import authGuard from "../../middlewares/authGuard";
 import { UserRole } from "@prisma/client";
 
-import { userValidationSchema } from "./user.validationSchema";
 import { userController } from "./user.controller";
-import { FileUploadHelper } from "../../../helpers/fileUploader";
+
 
 
 const router = express.Router();
 router.get('/',authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),userController.getAllUsers)
+router.get(
+  '/me',
+  authGuard(UserRole.ADMIN,UserRole.BLOGGER,UserRole.MODERATOR,UserRole.SUPER_ADMIN),
+  userController.getMyProfile
+)
+
+router.patch(
+  '/update-my-profile',
+  authGuard(UserRole.ADMIN,UserRole.BLOGGER,UserRole.MODERATOR,UserRole.SUPER_ADMIN),
+  userController.updateMyProfile
+
+);
 
 router.post(
   '/create-admin',
