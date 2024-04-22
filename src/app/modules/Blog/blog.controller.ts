@@ -10,6 +10,7 @@ import { filterValidQueryParams } from '../../../shared/filterValidQueryParams';
 
 import { paginationAndSortingParams } from '../../../shared/appConstants';
 import { blogValidParams } from './blog.constant';
+import { any } from 'zod';
 
 const createBlog = catchAsync(async (req: Request& {user?:any}, res: Response) => {
    const user =req.user
@@ -58,7 +59,32 @@ const getSingleBlog = catchAsync(async (req: Request, res: Response) => {
    });
 });
 
+const getMyAllBlogs = catchAsync(async (req: Request &  {user?:any}, res: Response) => {
+   const user=req.user;
+  
+   const validQueryParams = filterValidQueryParams(req.query, blogValidParams);
+   const paginationAndSortingQueryParams = filterValidQueryParams(
+      req.query,
+      paginationAndSortingParams,
+      
+   );
+
+   const result = await blogServicres.getMyAllBlogsFomDB(
+      validQueryParams,
+      paginationAndSortingQueryParams,
+      user
+   );
+
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'My blogs data fetched successfully!',
+      meta: result.meta,
+      data: result.result,
+   });
+});
+
 
 export const blogController = {
-   createBlog,getAllBlogs,getSingleBlog
+   createBlog,getAllBlogs,getSingleBlog,getMyAllBlogs
 };

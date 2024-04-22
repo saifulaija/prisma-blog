@@ -1,2 +1,2 @@
-export const searchableFields = ['name', 'email'];
-export const validParams = ['q', 'email', 'isActive'];
+export const userSearchableFields = ['name', 'email'];
+export const userValidParams = ['q', 'email', 'isActive'];

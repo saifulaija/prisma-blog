@@ -1,10 +1,14 @@
-import { Admin, UserRole } from '@prisma/client';
+import { Admin, Prisma, UserRole, UserStatus } from '@prisma/client';
 
 import prisma from '../../../shared/prismaClient';
 import { FileUploadHelper } from '../../../helpers/fileUploader';
 import { IUploadFile } from '../../interfaces/file';
 import { hashedPassword } from './user.utils';
 import { Request } from 'express';
+import { userSearchableFields } from './user.constant';
+import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
+import { IPaginationParams, ISortingParams } from '../../interfaces/paginationSorting';
+import { IUserFilterParams } from './user.interface';
 
 
 const createAdmin = async (payload:any) => {
@@ -58,6 +62,70 @@ const createAuthor = async (payload:any) => {
    return result;
  };
 
+
+
+
+ const getAllUsersFromDb = async (
+  queryParams: IUserFilterParams,
+  paginationAndSortingQueryParams: IPaginationParams & ISortingParams,
+user:any
+) => {
+
+  console.log(user)
+  const { q, ...otherQueryParams } = queryParams;
+
+  const { limit, skip, page, sortBy, sortOrder } =
+     generatePaginateAndSortOptions({
+        ...paginationAndSortingQueryParams,
+     });
+
+  const conditions: Prisma.UserWhereInput[] = [];
+
+  // filtering out the soft deleted users
+  conditions.push({
+    status : UserStatus.ACTIVE,
+  });
+
+  //@ searching
+  if (q) {
+     const searchConditions = userSearchableFields.map((field) => ({
+        [field]: { contains: q, mode: 'insensitive' },
+     }));
+     conditions.push({ OR: searchConditions });
+  }
+
+  //@ filtering with exact value
+  if (Object.keys(otherQueryParams).length > 0) {
+     const filterData = Object.keys(otherQueryParams).map((key) => ({
+        [key]: (otherQueryParams as any)[key],
+     }));
+     conditions.push(...filterData);
+  }
+
+  const result = await prisma.user.findMany({
+     where: { AND: conditions },
+     skip,
+     take: limit,
+     orderBy: {
+        [sortBy]: sortOrder,
+     },
+   
+  });
+
+  const total = await prisma.user.count({
+     where: { AND: conditions },
+  });
+
+  return {
+     meta: {
+        page,
+        limit,
+        total,
+     },
+     result,
+  };
+};
+
 export const userServices = {
-   createAdmin,createAuthor
+   createAdmin,createAuthor,getAllUsersFromDb
 };

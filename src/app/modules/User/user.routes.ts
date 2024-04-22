@@ -9,6 +9,7 @@ import { FileUploadHelper } from "../../../helpers/fileUploader";
 
 
 const router = express.Router();
+router.get('/',authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),userController.getAllUsers)
 
 router.post(
   '/create-admin',
