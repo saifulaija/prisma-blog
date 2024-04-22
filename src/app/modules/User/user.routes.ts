@@ -2,23 +2,25 @@ import express, { Request, Response, NextFunction } from "express";
 
 import authGuard from "../../middlewares/authGuard";
 import { UserRole } from "@prisma/client";
-import { fileUploader } from "../../../helpers/fileUploader";
+
 import { userValidationSchema } from "./user.validationSchema";
 import { userController } from "./user.controller";
+import { FileUploadHelper } from "../../../helpers/fileUploader";
+
 
 const router = express.Router();
 
 router.post(
-  "/",
-  authGuard(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  fileUploader.upload.single("file"),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = userValidationSchema.createAdminSchema.parse(
-      JSON.parse(req.body.data)
-    );
-
-    return userController.createAdmin(req, res, next);
-  }
+  '/create-admin',
+  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+ 
+  // (req: Request, res: Response, next: NextFunction) => {
+  //   req.body = userValidationSchema.createAdminSchema.parse(JSON.parse(req.body))
+  //   return userController.createAdmin(req, res, next)
+  // }
+  userController.createAdmin
 );
+
+router.post('/create-author', userController.createAuthor)
 
 export const userRoutes = router;

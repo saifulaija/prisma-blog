@@ -1,34 +1,63 @@
 import { Admin, UserRole } from '@prisma/client';
-import bcrypt from 'bcrypt';
+
 import prisma from '../../../shared/prismaClient';
-import { fileUploader } from '../../../helpers/fileUploader';
+import { FileUploadHelper } from '../../../helpers/fileUploader';
+import { IUploadFile } from '../../interfaces/file';
+import { hashedPassword } from './user.utils';
+import { Request } from 'express';
 
-const createAdmin = async (req: any): Promise<Admin> => {
-   if (req.file) {
-      const uploadedFile = await fileUploader.saveToCloudinary(req.file);
-      req.body.admin.profilePhoto = uploadedFile?.secure_url;
-   }
 
-   const hashedPassword = await bcrypt.hash(req.body.password, 10);
+const createAdmin = async (payload:any) => {
+  const {password,...admin}=payload
+ 
 
-   const userData = {
-      email: req.body.admin.email,
-      password: hashedPassword,
-      role: UserRole.ADMIN,
-   };
+ 
+   const hashPassword = await hashedPassword(password);
 
-   const result = await prisma.$transaction(async (trClient) => {
-      await trClient.user.create({
-         data: userData,
-      });
-      return await trClient.admin.create({
-         data: req.body.admin,
-      });
+   const result = await prisma.$transaction(async transactionClient => {
+     const newUser = await transactionClient.user.create({
+       data: {
+         email:admin.email,
+         password: hashPassword,
+         role: UserRole.ADMIN,
+       },
+     });
+     console.log({newUser})
+     const newAdmin = await transactionClient.admin.create({
+       data:admin,
+     });
+ 
+     return newAdmin;
    });
-
+ 
    return result;
-};
+ };
+const createAuthor = async (payload:any) => {
+  const {password,...author}=payload
+ 
 
-export const userService = {
-   createAdmin,
+ 
+   const hashPassword = await hashedPassword(password);
+
+   const result = await prisma.$transaction(async transactionClient => {
+     const newUser = await transactionClient.user.create({
+       data: {
+         email:author.email,
+         password: hashPassword,
+         role: UserRole.BLOGGER,
+       },
+     });
+     
+     const newAdmin = await transactionClient.author.create({
+       data:author,
+     });
+ 
+     return newAdmin;
+   });
+ 
+   return result;
+ };
+
+export const userServices = {
+   createAdmin,createAuthor
 };

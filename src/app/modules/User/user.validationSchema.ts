@@ -1,13 +1,23 @@
 import { z } from 'zod';
 
+// const createAdminSchema = z.object({
+//    password: z.string({ required_error: 'Password is required' }),
+//    admin: z.object({
+//       name: z.string({ required_error: 'Name is required' }),
+//       email: z.string({ required_error: 'Email is required' }),
+//       contactNumber: z.string({ required_error: 'Contact number is required' }),
+//    }),
+// });
+
 const createAdminSchema = z.object({
-   password: z.string({ required_error: 'Password is required' }),
-   admin: z.object({
-      name: z.string({ required_error: 'Name is required' }),
-      email: z.string({ required_error: 'Email is required' }),
-      contactNumber: z.string({ required_error: 'Contact number is required' }),
-   }),
-});
+   body:z.object({
+    password: z.string(),
+     email: z.string().email(),
+     name: z.string(),
+     contactNumber: z.string()
+   })
+  
+ });
 
 export const userValidationSchema = {
    createAdminSchema,

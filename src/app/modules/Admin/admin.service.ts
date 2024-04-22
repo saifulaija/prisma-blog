@@ -4,9 +4,10 @@ import {
    IPaginationParams,
    ISortingParams,
 } from '../../interfaces/paginationSorting';
-import { IUserFilterParams } from '../user/user.interface';
+
 import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
 import { searchableFields } from './admin.constants';
+import { IUserFilterParams } from '../User/user.interface';
 
 const getAllAdminFomDB = async (
    queryParams: IUserFilterParams,
