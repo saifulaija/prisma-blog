@@ -52,11 +52,34 @@ const createAuthor = async (payload: any) => {
       },
     });
 
-    const newAdmin = await transactionClient.author.create({
+    const newAuthor = await transactionClient.author.create({
       data: author,
     });
 
-    return newAdmin;
+    return newAuthor;
+  });
+
+  return result;
+};
+const createModarator = async (payload: any) => {
+  const { password, ...modarator } = payload;
+
+  const hashPassword = await hashedPassword(password);
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    await transactionClient.user.create({
+      data: {
+        email: modarator.email,
+        password: hashPassword,
+        role: UserRole.MODERATOR,
+      },
+    });
+
+    const newModarator = await transactionClient.moderator.create({
+      data: modarator,
+    });
+
+    return newModarator;
   });
 
   return result;
@@ -214,6 +237,7 @@ const changeProfileStatus = async (userId: string, status: UserStatus) => {
 export const userServices = {
   createAdmin,
   createAuthor,
+  createModarator,
   getAllUsersFromDb,
   getMyProfile,
   updateMyProfile,

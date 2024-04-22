@@ -13,16 +13,17 @@ router.get(
    AdminController.getAllAdmin
 );
 
-router.get('/:id', AdminController.getSingleAdmin);
+router.get('/:id', authGuard(UserRole.ADMIN, UserRole.SUPER_ADMIN), AdminController.getSingleAdmin);
 
 router.patch(
    '/:id',
+   authGuard(UserRole.ADMIN, UserRole.SUPER_ADMIN),
    validateRequest(adminValidationSchemas.update),
    AdminController.updateAdmin
 );
 
-router.delete('/:id', AdminController.deleteAdmin);
+router.delete('/:id', authGuard(UserRole.ADMIN, UserRole.SUPER_ADMIN), AdminController.deleteAdmin);
 
-router.delete('/soft/:id', AdminController.softDeleteAdmin);
+router.delete('/soft/:id',authGuard(UserRole.ADMIN, UserRole.SUPER_ADMIN), AdminController.softDeleteAdmin);
 
 export const AdminRoutes = router;

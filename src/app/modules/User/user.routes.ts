@@ -32,15 +32,12 @@ router.patch(
 
 router.post(
   '/create-admin',
-  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
- 
-  // (req: Request, res: Response, next: NextFunction) => {
-  //   req.body = userValidationSchema.createAdminSchema.parse(JSON.parse(req.body))
-  //   return userController.createAdmin(req, res, next)
-  // }
+authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
+validateRequest(userValidationSchema.createAdminSchema),
   userController.createAdmin
 );
 
-router.post('/create-author', userController.createAuthor)
+router.post('/create-author', authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),validateRequest(userValidationSchema.createAuthorSchema), userController.createAuthor)
+router.post('/create-modarator', authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),validateRequest(userValidationSchema.createModaratorSchema), userController.createModarator)
 
 export const userRoutes = router;

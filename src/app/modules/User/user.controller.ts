@@ -25,6 +25,15 @@ const createAuthor = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const createModarator = catchAsync(async (req: Request, res: Response) => {
+  const result = await userServices.createModarator(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Modarator created successfully!",
+    data: result,
+  });
+});
 
 const getAllUsers = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
@@ -95,6 +104,7 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   createAdmin,
   createAuthor,
+  createModarator,
   getAllUsers,
   getMyProfile,
   updateMyProfile,
