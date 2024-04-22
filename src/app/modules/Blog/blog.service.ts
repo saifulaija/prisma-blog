@@ -80,6 +80,15 @@ const getAllBlogFomDB = async (
     };
  };
 
+ const getSingleBlogFromDB = async (id: string) => {
+   return await prisma.blog.findUniqueOrThrow({
+      where: {
+         id
+        
+      },
+   });
+};
+
 export const blogServicres={
-    getAllBlogFomDB,craeteBlogIntoDb
+    getAllBlogFomDB,craeteBlogIntoDb,getSingleBlogFromDB
 }

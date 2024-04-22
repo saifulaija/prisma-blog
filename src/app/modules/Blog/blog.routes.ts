@@ -8,7 +8,11 @@ import { blogController } from "./blog.controller";
 import { userController } from "../User/user.controller";
 
 const router = express.Router();
-router.get('/', authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),blogController.getAllBlogs);
+router.get('/', 
+// authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
+blogController.getAllBlogs);
+
+router.get('/:id', blogController.getSingleBlog);
 
 router.post(
   "/create-blog",
