@@ -39,5 +39,6 @@ validateRequest(userValidationSchema.createAdminSchema),
 
 router.post('/create-author', authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),validateRequest(userValidationSchema.createAuthorSchema), userController.createAuthor)
 router.post('/create-modarator', authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),validateRequest(userValidationSchema.createModaratorSchema), userController.createModarator)
+router.post('/create-subscriber', userController.createSubscriber)
 
 export const userRoutes = router;

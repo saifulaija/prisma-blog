@@ -20,7 +20,7 @@ enum UserRole {
   ADMIN
   BLOGGER
   MODERATOR
-  USER
+  SUBSCRIBER
 }
 
 // user status
@@ -43,18 +43,20 @@ enum Gender {
 }
 
 model User {
-  id                     String     @id @default(uuid())
-  email                  String     @unique
+  id                     String      @id @default(uuid())
+  email                  String      @unique
   password               String
   role                   UserRole
-  passwordChangeRequired Boolean    @default(true)
-  status                 UserStatus @default(ACTIVE)
-  createdAt              DateTime   @default(now())
-  updatedAt              DateTime   @updatedAt
+  passwordChangeRequired Boolean?    @default(true)
+  status                 UserStatus  @default(ACTIVE)
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
   admin                  Admin?
   author                 Author?
   moderator              Moderator?
   like                   Like[]
+  comment                Comment[]
+  subscriber             Subscriber?
 
   @@map("users")
 }
@@ -71,6 +73,20 @@ model Admin {
   user          User     @relation(fields: [email], references: [email])
 
   @@map("admins")
+}
+
+model Subscriber {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  profilePhoto  String?
+  contactNumber String?
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [email], references: [email])
+
+  @@map("subscribers")
 }
 
 model Author {
@@ -132,15 +148,17 @@ model Blog {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String
-  authorId  String
-  author    Author   @relation(fields: [authorId], references: [id])
-  blogId    String
-  blog      Blog     @relation(fields: [blogId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  like      Like[]
+  id          String   @id @default(uuid())
+  content     String
+  commentorId String
+  comment     User     @relation(fields: [commentorId], references: [id])
+  authorId    String
+  author      Author   @relation(fields: [authorId], references: [id])
+  blogId      String
+  blog        Blog     @relation(fields: [blogId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  like        Like[]
 
   @@map("comments")
 }

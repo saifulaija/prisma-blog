@@ -84,6 +84,36 @@ const createModarator = async (payload: any) => {
 
   return result;
 };
+const createSubscriber = async (payload: any) => {
+  const { password, ...subscriber } = payload;
+
+  
+
+  const hashPassword = await hashedPassword(password);
+  console.log(hashPassword,subscriber)
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const userCreate= await transactionClient.user.create({
+      data: {
+        email: subscriber.email,
+        password: hashPassword,
+        role: UserRole.SUBSCRIBER,
+      },
+    });
+
+    console.log({userCreate})
+
+  
+
+    const newSubscriber = await transactionClient.subscriber.create({
+      data: subscriber,
+    });
+
+    return newSubscriber;
+  });
+
+  return result;
+};
 
 const getAllUsersFromDb = async (
   queryParams: IUserFilterParams,
@@ -222,7 +252,7 @@ const changeProfileStatus = async (userId: string, status: UserStatus) => {
     },
   });
   if (!isUserExist) {
-    throw new HTTPError(httpStatus.BAD_REQUEST, 'User does not exists!');
+    throw new HTTPError(httpStatus.BAD_REQUEST, "User does not exists!");
   }
 
   const updatedUser = await prisma.user.update({
@@ -238,8 +268,9 @@ export const userServices = {
   createAdmin,
   createAuthor,
   createModarator,
+  createSubscriber,
   getAllUsersFromDb,
   getMyProfile,
   updateMyProfile,
-  changeProfileStatus
+  changeProfileStatus,
 };

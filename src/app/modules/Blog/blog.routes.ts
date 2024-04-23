@@ -27,7 +27,7 @@ router.post(
   "/create-blog",
 
   authGuard(UserRole.BLOGGER),
-  validateRequest(blogValidationSchema.createBlog),
+  // validateRequest(blogValidationSchema.createBlog),
   blogController.createBlog
 );
 router.delete(
