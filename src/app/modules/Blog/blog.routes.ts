@@ -14,6 +14,7 @@ router.get(
   authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
   blogController.getAllBlogs
 );
+// router.get('/get-single-blog/:id',)
 
 router.get(
   "/my-blogs",

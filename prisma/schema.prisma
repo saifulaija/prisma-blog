@@ -20,6 +20,7 @@ enum UserRole {
   ADMIN
   BLOGGER
   MODERATOR
+  USER
 }
 
 // user status
@@ -124,15 +125,15 @@ model Blog {
   visibility Visibility @default(PUBLIC)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+  views      Int?       @default(0)
   comment    Comment[]
 
   @@map("blogs")
 }
 
 model Comment {
-  id      String @id @default(uuid())
-  content String
-
+  id        String   @id @default(uuid())
+  content   String
   authorId  String
   author    Author   @relation(fields: [authorId], references: [id])
   blogId    String

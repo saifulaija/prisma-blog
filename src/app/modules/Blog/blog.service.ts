@@ -63,6 +63,14 @@ const getAllBlogFomDB = async (
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      author: true,
+      comment: {
+        include: {
+          like: true,
+        },
+      },
+    },
   });
 
   const total = await prisma.blog.count({
@@ -80,12 +88,33 @@ const getAllBlogFomDB = async (
 };
 
 const getSingleBlogFromDB = async (id: string) => {
-  return await prisma.blog.findUniqueOrThrow({
-    where: {
-      id,
-    },
+  
+  const blogPost = await prisma.$transaction(async (tx) => {
+    // Find the blog post and return it
+    const post = await tx.blog.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    // Increment views within the transaction
+    await tx.blog.update({
+      where: {
+        id,
+      },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+
+    return post;
   });
+
+  return blogPost;
 };
+
 const getMyAllBlogsFomDB = async (
   queryParams: IBlogFilterParams,
   paginationAndSortingQueryParams: IPaginationParams & ISortingParams,
@@ -164,39 +193,37 @@ const getMyAllBlogsFomDB = async (
 };
 
 const deleteBlogFromDB = async (id: string) => {
-   await prisma.blog.findUniqueOrThrow({
-      where:{
-         id
-      }
-   })
- const result =  await prisma.blog.delete({
-      where: {
-         id,
-        
-      },
-   });
+  await prisma.blog.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+  const result = await prisma.blog.delete({
+    where: {
+      id,
+    },
+  });
 
-   return result
-}
+  return result;
+};
 
 const updateBlogIntoDB = async (
-   id: string,
-   data: Partial<Blog>
+  id: string,
+  data: Partial<Blog>
 ): Promise<Blog> => {
-   await prisma.blog.findUniqueOrThrow({
-      where: {
-         id,
-        
-      },
-   });
+  await prisma.blog.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
 
-   const result = await prisma.blog.update({
-      where: {
-         id,
-      },
-      data,
-   });
-   return result
+  const result = await prisma.blog.update({
+    where: {
+      id,
+    },
+    data,
+  });
+  return result;
 };
 
 export const blogServicres = {
@@ -205,6 +232,5 @@ export const blogServicres = {
   getSingleBlogFromDB,
   getMyAllBlogsFomDB,
   deleteBlogFromDB,
-  updateBlogIntoDB
-
+  updateBlogIntoDB,
 };

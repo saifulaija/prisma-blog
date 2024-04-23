@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 
 import authGuard from "../../middlewares/authGuard";
 import { UserRole } from "@prisma/client";
