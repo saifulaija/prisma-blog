@@ -52,7 +52,13 @@ const updateCommentIntoDb = async (
 
 const deleteCommentFromDB=async(id:string,user:any)=>{
 
-  const commentData=await prisma.comment.findUniqueOrThrow({
+   await prisma.user.findUniqueOrThrow({
+    where:{
+      email:user.email
+    }
+  })
+
+  await prisma.comment.findUniqueOrThrow({
     where:{
       id
     }
