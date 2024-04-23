@@ -23,6 +23,7 @@ router.get(
 );
 router.get("/:id", blogController.getSingleBlog);
 
+
 router.post(
   "/create-blog",
 

@@ -59,17 +59,7 @@ const getSingleBlog = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-// const getSingleBlogForEveryOne = catchAsync(async (req: Request, res: Response) => {
-//   const { id } = req.params;
 
-//   const result = await blogServicres.getSingleBlogFromDB(id);
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "Blog data fetched successfully!",
-//     data: result,
-//   });
-// });
 
 const getMyAllBlogs = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
@@ -119,6 +109,7 @@ const updateBlog = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
 export const blogController = {
   createBlog,
   getAllBlogs,
@@ -126,4 +117,5 @@ export const blogController = {
   getMyAllBlogs,
   deleteBlog,
   updateBlog,
+ 
 };

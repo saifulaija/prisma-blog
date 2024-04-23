@@ -88,7 +88,6 @@ const getAllBlogFomDB = async (
 };
 
 const getSingleBlogFromDB = async (id: string) => {
-  
   const blogPost = await prisma.$transaction(async (tx) => {
     // Find the blog post and return it
     const post = await tx.blog.findUnique({
@@ -226,6 +225,7 @@ const updateBlogIntoDB = async (
   return result;
 };
 
+
 export const blogServicres = {
   getAllBlogFomDB,
   craeteBlogIntoDb,
@@ -233,4 +233,5 @@ export const blogServicres = {
   getMyAllBlogsFomDB,
   deleteBlogFromDB,
   updateBlogIntoDB,
+ 
 };

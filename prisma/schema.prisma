@@ -54,9 +54,9 @@ model User {
   admin                  Admin?
   author                 Author?
   moderator              Moderator?
-  like                   Like[]
   comment                Comment[]
   subscriber             Subscriber?
+  Like                   Like[]
 
   @@map("users")
 }
@@ -137,12 +137,14 @@ model Blog {
   category   String?
   image      String?
   authorId   String
+  likeCount  Int?       @default(0)
   author     Author     @relation(fields: [authorId], references: [id])
   visibility Visibility @default(PUBLIC)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   views      Int?       @default(0)
   comment    Comment[]
+  like       Like[]
 
   @@map("blogs")
 }
@@ -158,20 +160,17 @@ model Comment {
   blog        Blog     @relation(fields: [blogId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  like        Like[]
 
   @@map("comments")
 }
 
 model Like {
-  id String @id @default(uuid())
-
-  commentId String
-  comment   Comment  @relation(fields: [commentId], references: [id])
-  userId    String
+  id        String   @id @default(uuid())
+  userId    String 
   user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  blogId    String 
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  createdAt DateTime @default(now()) 
+  updatedAt   DateTime @updatedAt
   @@map("likes")
 }
