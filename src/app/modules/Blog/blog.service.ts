@@ -65,11 +65,6 @@ const getAllBlogFomDB = async (
     },
     include: {
       author: true,
-      comment: {
-        include: {
-          like: true,
-        },
-      },
     },
   });
 
@@ -225,7 +220,6 @@ const updateBlogIntoDB = async (
   return result;
 };
 
-
 export const blogServicres = {
   getAllBlogFomDB,
   craeteBlogIntoDb,
@@ -233,5 +227,4 @@ export const blogServicres = {
   getMyAllBlogsFomDB,
   deleteBlogFromDB,
   updateBlogIntoDB,
- 
 };
