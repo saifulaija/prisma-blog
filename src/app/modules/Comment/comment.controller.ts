@@ -4,8 +4,9 @@ import { sendResponse } from "../../../shared/sendResponse";
 import { CommentServices } from "./comment.service";
 import { Request, Response } from "express";
 
-const createComment = catchAsync(async (req: Request, res: Response) => {
-  const result = await CommentServices.createCommentIntoDB(req.body);
+const createComment = catchAsync(async (req: Request & {user?:any}, res: Response) => {
+  const user=req.user;
+  const result = await CommentServices.createCommentIntoDB(user,req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -13,9 +14,10 @@ const createComment = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-const updateMyComment = catchAsync(async (req: Request, res: Response) => {
+const updateMyComment = catchAsync(async (req: Request & {user?:any}, res: Response) => {
   const { id } = req.params;
-  const result = await CommentServices.updateCommentIntoDb(id, req.body);
+  const user =req.user;
+  const result = await CommentServices.updateCommentIntoDb(id, req.body,user);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -23,7 +25,18 @@ const updateMyComment = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const deleteComment = catchAsync(async (req: Request & {user?:any}, res: Response) => {
+  const { id } = req.params;
+  const user =req.user;
+  const result = await CommentServices.deleteCommentFromDB(id,user);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Delete comment  successfully!",
+    data: result,
+  });
+});
 
 export const CommentControllers = {
-  createComment,updateMyComment
+  createComment,updateMyComment,deleteComment
 };
