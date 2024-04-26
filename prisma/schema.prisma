@@ -131,14 +131,14 @@ model Moderator {
 }
 
 model Blog {
-  id         String     @id @default(uuid())
-  title      String
-  content    String
-  category   String?
-  image      String?
-  authorId   String
-  likeCount  Int?       @default(0)
+  id       String  @id @default(uuid())
+  title    String
+  content  String
+  category String?
+  image    String?
+  authorId String
   author     Author     @relation(fields: [authorId], references: [id])
+  likeCount  Int?       @default(0)
   visibility Visibility @default(PUBLIC)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
@@ -166,11 +166,12 @@ model Comment {
 
 model Like {
   id        String   @id @default(uuid())
-  userId    String 
+  userId    String
   user      User     @relation(fields: [userId], references: [id])
-  blogId    String 
+  blogId    String
   blog      Blog     @relation(fields: [blogId], references: [id])
-  createdAt DateTime @default(now()) 
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("likes")
 }

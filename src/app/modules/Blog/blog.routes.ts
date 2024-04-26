@@ -11,13 +11,13 @@ import { validateRequest } from "../../middlewares/validateRequest";
 const router = express.Router();
 router.get(
   "/",
-  authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
+  authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN,UserRole.BLOGGER),
   blogController.getAllBlogs
 );
 // router.get('/get-single-blog/:id',)
 
 router.get(
-  "/my-blogs",
+  "/my-blogs/:userId",
   authGuard(UserRole.BLOGGER),
   blogController.getMyAllBlogs
 );

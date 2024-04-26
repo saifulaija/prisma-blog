@@ -29,6 +29,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
    }
    const accessToken = jwtHelpers.generateToken(
       {
+         userId:userData.id,
          email: userData.email,
          role: userData.role,
       },
@@ -72,16 +73,18 @@ const refreshToken = async (token: string) => {
 
    const accessToken = jwtHelpers.generateToken(
       {
+         userId:userData.id,
          email: userData.email,
          role: userData.role,
+
       },
       config.jwt.jwt_secret as Secret,
       config.jwt.expires_in as string
    );
 
    return {
-      accessToken,
-      passwordChangeRequired: userData.passwordChangeRequired,
+      accessToken
+    
    };
 };
 

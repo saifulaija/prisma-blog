@@ -112,11 +112,12 @@ const getSingleBlogFromDB = async (id: string) => {
 const getMyAllBlogsFomDB = async (
   queryParams: IBlogFilterParams,
   paginationAndSortingQueryParams: IPaginationParams & ISortingParams,
-  user: any
+  user: any,
+  userId: string
 ) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      id: userId,
     },
   });
 
@@ -125,8 +126,6 @@ const getMyAllBlogsFomDB = async (
       email: userData.email,
     },
   });
-
-  console.log(authorData.id);
 
   const { q, ...otherQueryParams } = queryParams;
 
