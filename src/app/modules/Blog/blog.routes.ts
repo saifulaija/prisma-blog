@@ -11,7 +11,7 @@ import { validateRequest } from "../../middlewares/validateRequest";
 const router = express.Router();
 router.get(
   "/",
-  authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN,UserRole.BLOGGER),
+  // authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN,UserRole.BLOGGER),
   blogController.getAllBlogs
 );
 // router.get('/get-single-blog/:id',)

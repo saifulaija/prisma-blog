@@ -5,11 +5,12 @@ import httpStatus from "http-status";
 import { LikeServices } from "./like.service";
 
 const like = catchAsync(async (req: Request & {user?:any}, res: Response) => {
-    const { id } = req.params;
-    const user=req.user;
+  const { blogId } = req.params;
+  const { userId } = req.body;
+    console.log('user', blogId,userId)
   
   
-    const result = await LikeServices.like(id, user);
+    const result = await LikeServices.like(blogId, userId);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -19,20 +20,8 @@ const like = catchAsync(async (req: Request & {user?:any}, res: Response) => {
   });
 
 
-  const unlike = catchAsync(async (req: Request & {user?:any}, res: Response) => {
-    const { id } = req.params;
-    const user=req.user;
-   
-  
-    const result = await LikeServices.unLike(id, user);
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "like deleted  successfully!",
-      data: result,
-    });
-  });
+ 
 
   export const LikeControllers={
-like,unlike
+like
   }

@@ -89,6 +89,9 @@ const getSingleBlogFromDB = async (id: string) => {
       where: {
         id,
       },
+      include:{
+        author:true
+      }
     });
 
     // Increment views within the transaction

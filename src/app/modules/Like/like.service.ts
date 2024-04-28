@@ -2,78 +2,116 @@ import httpStatus from "http-status";
 import prisma from "../../../shared/prismaClient";
 import { HTTPError } from "../../errors/HTTPError";
 
-const like = async (id: string, user: any) => {
+// const like = async (blogId: string, userId: string) => {
+//   console.log({ blogId, userId });
+//   const userData = await prisma.user.findUniqueOrThrow({
+//     where: {
+//       id: userId,
+//     },
+//   });
+
+//   const existingLike = await prisma.like.findFirst({
+//     where: {
+//       blogId: blogId,
+//       userId: userData.id,
+//     },
+//   });
+
+//   console.log(existingLike);
+
+//   if (existingLike) {
+//     return await prisma.$transaction(async (tx) => {
+//       await tx.like.delete({
+//         where: {
+//           id: existingLike.id,
+//         },
+//       });
+
+//       const updatedBlog = await tx.blog.update({
+//         where: {
+//           id: blogId,
+//         },
+//         data: { likeCount: { decrement: 1 } },
+//       });
+//       return updatedBlog;
+//     });
+//   }
+
+//   if (!existingLike) {
+//     return await prisma.$transaction(async (tx) => {
+//       const createLike = await tx.like.create({
+//         data: {
+//           blogId: blogId,
+//           userId: userId,
+//         },
+//       });
+//       const updatedBlog = await tx.blog.update({
+//         where: {
+//           id: blogId,
+//         },
+//         data: { likeCount: { increment: 1 } },
+//       });
+//       return updatedBlog;
+//     });
+//   }
+// };
+
+
+const like = async (blogId: string, userId: string) => {
+  console.log({ blogId, userId });
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      id: userId,
     },
   });
 
   const existingLike = await prisma.like.findFirst({
     where: {
-      blogId: id,
+      blogId: blogId,
       userId: userData.id,
     },
   });
+
+  console.log(existingLike);
+
   if (existingLike) {
-    throw new HTTPError(
-      httpStatus.BAD_REQUEST,
-      "User has already liked this blog"
-    );
+    return await prisma.$transaction(async (tx) => {
+      await tx.like.delete({
+        where: {
+          id: existingLike.id,
+        },
+      });
+
+      const updatedBlog = await tx.blog.update({
+        where: {
+          id: blogId,
+        },
+        data: { likeCount: { decrement: 1 } },
+      });
+      return updatedBlog;
+    });
   }
-
-  const result = await prisma.$transaction(async (tx) => {
-    await prisma.like.create({
-      data: {
-        blogId: id,
-        userId: userData.id,
-      },
-    });
-
-    await prisma.blog.update({
-      where: { id: id },
-      data: { likeCount: { increment: 1 } },
-    });
-  });
-
-  console.log(result);
-
-  return result;
-};
-
-const unLike = async (id: string, user: any) => {
-  const userData = await prisma.user.findUniqueOrThrow({
-    where: {
-      email: user.email,
-    },
-  });
-  console.log(userData);
-
-  const existingLike = await prisma.like.findFirst({
-    where: {
-      blogId: id,
-      userId: userData.id,
-    },
-  });
 
   if (!existingLike) {
-    throw new Error("User has not liked this blog");
+    return await prisma.$transaction(async (tx) => {
+      const createLike = await tx.like.create({
+        data: {
+          blogId: blogId,
+          userId: userId,
+        },
+      });
+      const updatedBlog = await tx.blog.update({
+        where: {
+          id: blogId,
+        },
+        data: { likeCount: { increment: 1 } },
+      });
+      return updatedBlog;
+    });
   }
-
-  await prisma.like.delete({
-    where: {
-      id: existingLike.id,
-    },
-  });
-
-  // Decrement the likeCount in the blog model
-  await prisma.blog.update({
-    where: { id },
-    data: { likeCount: { decrement: 1 } },
-  });
 };
+
 
 export const LikeServices = {
   like,
-  unLike,
 };
