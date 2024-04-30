@@ -5,6 +5,7 @@ const createBlog = z.object({
     
     title: z.string(),
     content: z.string(),
+    conclusion:z.string(),
     image: z.string().optional(),
     authorId: z.string(),
     views:z.number().optional(),
@@ -19,7 +20,8 @@ const updateBlog = z.object({
    body: z.object({
     title: z.string().optional(),
     content: z.string().optional(),
-    category:z.string().optional()
+    category:z.string().optional(),
+    conclusion:z.string().optional()
    }),
 });
 

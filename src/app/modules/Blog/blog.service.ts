@@ -1,4 +1,4 @@
-import { Blog, Prisma, Visibility } from "@prisma/client";
+import { Blog, Prisma, UserRole, Visibility } from "@prisma/client";
 import prisma from "../../../shared/prismaClient";
 import { IBlogFilterParams } from "./blog.interface";
 import {
@@ -9,6 +9,7 @@ import { generatePaginateAndSortOptions } from "../../../helpers/paginationHelpe
 import { blogSearchableFields } from "./blog.constant";
 
 const craeteBlogIntoDb = async (payload: Blog, user: any) => {
+  console.log({user})
   const authorData = await prisma.author.findUniqueOrThrow({
     where: {
       email: user.email,
@@ -82,16 +83,144 @@ const getAllBlogFomDB = async (
   };
 };
 
-const getSingleBlogFromDB = async (id: string) => {
+// const getSingleBlogFromDB = async (id: string, user: any) => {
+//   console.log({user})
+//   const blogPost = await prisma.$transaction(async (tx) => {
+//     let includeOptions = {};
+//     console.log({includeOptions})
+
+//     switch (user.role) {
+//       case UserRole.ADMIN:
+//         includeOptions = {
+//           admin: true,
+//         };
+//         break;
+//       case UserRole.BLOGGER:
+//         includeOptions = {
+//           blogger: true,
+//         };
+//         break;
+//       case UserRole.SUBSCRIBER:
+//         includeOptions = {
+//           subscriber: true,
+//         };
+//         break;
+
+//       default:
+//         break;
+//     }
+
+//     // Find the blog post and return it
+//     const post = await tx.blog.findUnique({
+//       where: {
+//         id,
+//       },
+//       include: {
+//         author: true,
+
+//         comment: {
+//           include: {
+//             comment: {
+//               include: includeOptions
+//             },
+//           },
+//         },
+//       },
+//     });
+
+//     // const post = await tx.blog.findUnique({
+//     //   where: {
+//     //     id,
+//     //   },
+//     //   include: {
+//     //     author: true,
+//     //     comment: {
+//     //       include: {
+//     //         comment: {
+//     //           select: {
+//     //             id: true,
+//     //             email: true,
+//     //             role: true,
+//     //             profilePhoto:true
+//     //             ...(user:any) => {
+//     //               switch (user.role) {
+//     //                 case " SUBSCRIBER":
+//     //                   return { subscriber: true };
+//     //                 case " ADMIN":
+//     //                   return { admin: true };
+//     //                 case " MODERATOR":
+//     //                   return { moderator: true };
+//     //                 default:
+//     //                   return {};
+//     //               }
+//     //             },
+//     //           },
+//     //         },
+//     //       },
+//     //     },
+//     //   },
+//     // });
+
+//     // Increment views within the transaction
+//     await tx.blog.update({
+//       where: {
+//         id,
+//       },
+//       data: {
+//         views: {
+//           increment: 1,
+//         },
+//       },
+//     });
+
+//     return post;
+//   });
+
+//   return blogPost;
+// };
+
+
+const getSingleBlogFromDB = async (id: string, user: any) => {
+  console.log({user})
   const blogPost = await prisma.$transaction(async (tx) => {
+    let includeOptions = {};
+
+    switch (user.role) {
+      case UserRole.ADMIN:
+        includeOptions = {
+          admin: true,
+        };
+        break;
+      case UserRole.BLOGGER:
+        includeOptions = {
+          author: true,
+        };
+        break;
+      case UserRole.SUBSCRIBER:
+        includeOptions = {
+          subscriber: true,
+        };
+        break;
+
+      default:
+        break;
+    }
+
     // Find the blog post and return it
     const post = await tx.blog.findUnique({
       where: {
         id,
       },
-      include:{
-        author:true
-      }
+      include: {
+        author: true,
+        comment: {
+          include: {
+            comment :{
+              include:includeOptions
+            }
+          },
+        },
+      },
     });
 
     // Increment views within the transaction
@@ -111,6 +240,7 @@ const getSingleBlogFromDB = async (id: string) => {
 
   return blogPost;
 };
+
 
 const getMyAllBlogsFomDB = async (
   queryParams: IBlogFilterParams,

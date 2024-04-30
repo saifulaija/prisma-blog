@@ -3,9 +3,10 @@ import prisma from "../../../shared/prismaClient";
 import { TComment } from "./comment.constant";
 
 const createCommentIntoDB = async (user: any, payload: TComment) => {
+  console.log(user)
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email
     },
   });
 
@@ -25,9 +26,11 @@ const createCommentIntoDB = async (user: any, payload: TComment) => {
 
 const updateCommentIntoDb = async (
   id: string,
-  data: Partial<Comment>,
+  payload: Partial<Comment>,
   user: any
 ) => {
+
+  console.log(payload)
   const commentorData = await prisma.user.findUniqueOrThrow({
     where: {
       email: user.email,
@@ -45,7 +48,7 @@ const updateCommentIntoDb = async (
     where: {
       id,
     },
-    data,
+  data:payload
   });
   return result;
 };
@@ -74,8 +77,47 @@ const deleteCommentFromDB=async(id:string,user:any)=>{
   return result
 }
 
+const getAllCommentsFromDB=async(blogId:string)=>{
+  await prisma.blog.findUniqueOrThrow({
+    where:{
+      id:blogId
+    }
+  })
+
+  const result =await prisma.comment.findMany({
+    where:{
+      blogId:blogId
+    },
+    include:{
+      comment:true
+    }
+  })
+ return result
+}
+
+const getSingleCommentFromDB=async(id:string,user:any)=>{
+
+  await prisma.user.findUniqueOrThrow({
+    where:{
+      email:user.email
+    }
+  })
+
+  const result = await prisma.comment.findFirstOrThrow({
+    where:{
+      id,
+      commentorId:user.id
+    }
+  })
+ return result
+}
+
 export const CommentServices = {
   createCommentIntoDB,
   updateCommentIntoDb,
-  deleteCommentFromDB
+  deleteCommentFromDB,
+  getAllCommentsFromDB,
+  getSingleCommentFromDB
+
+
 };

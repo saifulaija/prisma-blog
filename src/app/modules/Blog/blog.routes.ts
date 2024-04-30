@@ -21,7 +21,7 @@ router.get(
   authGuard(UserRole.BLOGGER),
   blogController.getMyAllBlogs
 );
-router.get("/:id", blogController.getSingleBlog);
+router.get("/:id",   authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN,UserRole.BLOGGER),  blogController.getSingleBlog);
 
 
 router.post(

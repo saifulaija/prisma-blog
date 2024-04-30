@@ -48,10 +48,11 @@ const getAllBlogs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getSingleBlog = catchAsync(async (req: Request, res: Response) => {
+const getSingleBlog = catchAsync(async (req: Request & {user?:any}, res: Response) => {
   const { id } = req.params;
+  const user = req.user;
 
-  const result = await blogServicres.getSingleBlogFromDB(id);
+  const result = await blogServicres.getSingleBlogFromDB(id,user);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

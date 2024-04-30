@@ -44,9 +44,11 @@ enum Gender {
 
 model User {
   id                     String      @id @default(uuid())
+  name                   String?
   email                  String      @unique
   password               String
   role                   UserRole
+  profilePhoto           String?
   passwordChangeRequired Boolean?    @default(true)
   status                 UserStatus  @default(ACTIVE)
   createdAt              DateTime    @default(now())
@@ -112,6 +114,8 @@ model Author {
   user    User      @relation(fields: [email], references: [email])
   blog    Blog[]
   Comment Comment[]
+
+  @@map("authors")
 }
 
 model Moderator {
@@ -131,12 +135,13 @@ model Moderator {
 }
 
 model Blog {
-  id       String  @id @default(uuid())
-  title    String
-  content  String
-  category String?
-  image    String?
-  authorId String
+  id         String     @id @default(uuid())
+  title      String
+  content    String
+  category   String?
+  image      String?
+  conclusion String
+  authorId   String
   author     Author     @relation(fields: [authorId], references: [id])
   likeCount  Int?       @default(0)
   visibility Visibility @default(PUBLIC)
