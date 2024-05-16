@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get(
   "/",
-  authGuard(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  // authGuard(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   AuthorController.getAllAuthor
 );
 

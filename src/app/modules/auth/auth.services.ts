@@ -18,6 +18,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
          status: UserStatus.ACTIVE,
       },
    });
+   console.log(userData)
 
    const isCorrectPassword: boolean = await bcrypt.compare(
       payload.password,
@@ -166,45 +167,77 @@ const forgotPassword = async ({ email }: { email: string }) => {
    await emailSender(userData.email, htmlContent);
 };
 
-const resetPassword = async (
-   token: string,
-   payload: { id: string; password: string }
-) => {
-   //@ checking if the user exist
-   await prisma.user.findUniqueOrThrow({
-      where: {
-         id: payload.id,
-         status: UserStatus.ACTIVE,
-      },
-   });
+// const resetPassword = async (
+//    token: string,
+//    payload: { id: string; password: string }
+// ) => {
+//    //@ checking if the user exist
+//    await prisma.user.findUniqueOrThrow({
+//       where: {
+//          id: payload.id,
+//          status: UserStatus.ACTIVE,
+//       },
+//    });
 
-   //@ verifying token
-   const isValidToken = jwtHelpers.verifyToken(
-      token,
-      config.jwt.reset_password_token_secret as Secret
-   );
+//    //@ verifying token
+//    const isValidToken = jwtHelpers.verifyToken(
+//       token,
+//       config.jwt.reset_password_token_secret as Secret
+//    );
 
-   if (!isValidToken) {
-      throw new HTTPError(httpStatus.FORBIDDEN, 'Invalid Token');
+//    if (!isValidToken) {
+//       throw new HTTPError(httpStatus.FORBIDDEN, 'Invalid Token');
+//    }
+
+//    //@ hashing the new password
+//    const hashedPassword = await bcrypt.hash(payload.password, 10);
+
+//    //@ updating the password and also changing the passwordChangeRequired to false
+//    await prisma.user.update({
+//       where: {
+//          id: payload.id,
+//       },
+//       data: {
+//          password: hashedPassword,
+//       },
+//    });
+
+ 
+// };
+
+const resetPassword = async (payload: { id: string, newPassword: string }, token: string) => {
+
+
+   const isUserExist = await prisma.user.findUnique({
+       where: {
+           id: payload.id,
+           status: UserStatus.ACTIVE
+       }
+   })
+
+
+
+   if (!isUserExist) {
+       throw new HTTPError(httpStatus.BAD_REQUEST, "User not found!")
    }
 
-   //@ hashing the new password
-   const hashedPassword = await bcrypt.hash(payload.password, 10);
+   const isVarified = jwtHelpers.verifyToken(token, config.jwt.jwt_secret as string);
+   console.log(isVarified,'======================')
+   if (!isVarified) {
+       throw new HTTPError(httpStatus.UNAUTHORIZED, "Something went wrong!")
+   }
 
-   //@ updating the password and also changing the passwordChangeRequired to false
+   const password = await bcrypt.hash(payload.newPassword, Number(config.bycrypt_salt_rounds));
+
    await prisma.user.update({
-      where: {
-         id: payload.id,
-      },
-      data: {
-         password: hashedPassword,
-      },
-   });
-
-   return {
-      message: 'Password changed successfully',
-   };
-};
+       where: {
+           id: payload.id
+       },
+       data: {
+           password
+       }
+   })
+}
 
 export const authServices = {
    loginUser,

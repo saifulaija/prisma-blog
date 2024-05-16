@@ -17,11 +17,15 @@ router.get(
 // router.get('/get-single-blog/:id',)
 
 router.get(
-  "/my-blogs/:userId",
+  "/my-blogs",
   authGuard(UserRole.BLOGGER),
   blogController.getMyAllBlogs
 );
-router.get("/:id",   authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN,UserRole.BLOGGER),  blogController.getSingleBlog);
+router.get("/:id",   authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN,UserRole.BLOGGER,UserRole.SUBSCRIBER),  blogController.getSingleBlog);
+
+router.get("/get-single-blog/:id",  
+//  authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN,UserRole.SUBSCRIBER),
+   blogController.getSingleBlogBYModerator);
 
 
 router.post(
@@ -47,6 +51,12 @@ router.patch(
   authGuard(UserRole.MODERATOR,UserRole.BLOGGER,UserRole.ADMIN,UserRole.SUPER_ADMIN),
   validateRequest(blogValidationSchema.updateBlog),
   blogController.updateBlog
+);
+router.patch(
+  "/change-approval-status/:id",
+  // authGuard(UserRole.MODERATOR,UserRole.ADMIN,UserRole.SUPER_ADMIN),
+  validateRequest(blogValidationSchema.updateChangeApprovalStatusBlog),
+  blogController.changeApprovalStatusBlog
 );
 
 export const blogRoutes = router;

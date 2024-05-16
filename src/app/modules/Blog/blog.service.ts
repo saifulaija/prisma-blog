@@ -1,4 +1,10 @@
-import { Blog, Prisma, UserRole, Visibility } from "@prisma/client";
+import {
+  Blog,
+  Prisma,
+  Published_status,
+  UserRole,
+  Visibility,
+} from "@prisma/client";
 import prisma from "../../../shared/prismaClient";
 import { IBlogFilterParams } from "./blog.interface";
 import {
@@ -9,7 +15,7 @@ import { generatePaginateAndSortOptions } from "../../../helpers/paginationHelpe
 import { blogSearchableFields } from "./blog.constant";
 
 const craeteBlogIntoDb = async (payload: Blog, user: any) => {
-  console.log({user})
+  console.log({ user });
   const authorData = await prisma.author.findUniqueOrThrow({
     where: {
       email: user.email,
@@ -179,9 +185,8 @@ const getAllBlogFomDB = async (
 //   return blogPost;
 // };
 
-
 const getSingleBlogFromDB = async (id: string, user: any) => {
-  console.log({user})
+  console.log({ user });
   const blogPost = await prisma.$transaction(async (tx) => {
     let includeOptions = {};
 
@@ -215,9 +220,9 @@ const getSingleBlogFromDB = async (id: string, user: any) => {
         author: true,
         comment: {
           include: {
-            comment :{
-              include:includeOptions
-            }
+            comment: {
+              include: includeOptions,
+            },
           },
         },
       },
@@ -241,16 +246,14 @@ const getSingleBlogFromDB = async (id: string, user: any) => {
   return blogPost;
 };
 
-
 const getMyAllBlogsFomDB = async (
   queryParams: IBlogFilterParams,
   paginationAndSortingQueryParams: IPaginationParams & ISortingParams,
-  user: any,
-  userId: string
+  user: any
 ) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
-      id: userId,
+      id: user.userId,
     },
   });
 
@@ -318,16 +321,56 @@ const getMyAllBlogsFomDB = async (
   };
 };
 
+// const deleteBlogFromDB = async (id: string) => {
+//   await prisma.blog.findUniqueOrThrow({
+//     where: {
+//       id,
+//     },
+//   });
+
+//   const result = await prisma.$transaction(async (tx) => {
+//     const deleteBlog = await tx.blog.delete({
+//       where: {
+//         id,
+//       },
+
+//     });
+//     return deleteBlog
+//     await prisma.comment.deleteMany({
+//       where:{
+//         blogId:id
+//       }
+//     })
+//   });
+
+//   return result;
+
+// };
+
 const deleteBlogFromDB = async (id: string) => {
-  await prisma.blog.findUniqueOrThrow({
-    where: {
-      id,
-    },
-  });
-  const result = await prisma.blog.delete({
-    where: {
-      id,
-    },
+  // Use a Prisma transaction to ensure atomicity
+  const result = await prisma.$transaction(async (tx) => {
+    // Delete all comments associated with the blog
+    await tx.comment.deleteMany({
+      where: {
+        blogId: id,
+      },
+    });
+    await tx.like.deleteMany({
+      where: {
+        blogId: id,
+      },
+    });
+
+    // Delete the blog
+    const deleteBlog = await tx.blog.delete({
+      where: {
+        id,
+      },
+    });
+
+    // Return the deleted blog
+    return deleteBlog;
   });
 
   return result;
@@ -351,6 +394,44 @@ const updateBlogIntoDB = async (
   });
   return result;
 };
+const changeApprovalStatusDB = async (
+  id: string,
+  data: Partial<Blog>
+): Promise<Blog> => {
+  await prisma.blog.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.blog.update({
+    where: {
+      id,
+      NOT: {
+        publishedStatus: {
+          in: [Published_status.CANCEL],
+        },
+      },
+    },
+    data,
+  });
+
+  return result;
+};
+
+const getSingleBlogBYModerator=async(id:string)=>{
+ 
+  const blogData= await prisma.blog.findUniqueOrThrow({
+    where:{
+      id
+    },
+    include:{
+      author:true
+    }
+  })
+
+return blogData
+}
 
 export const blogServicres = {
   getAllBlogFomDB,
@@ -359,4 +440,6 @@ export const blogServicres = {
   getMyAllBlogsFomDB,
   deleteBlogFromDB,
   updateBlogIntoDB,
+  changeApprovalStatusDB,
+  getSingleBlogBYModerator
 };

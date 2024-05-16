@@ -24,10 +24,17 @@ const updateBlog = z.object({
     conclusion:z.string().optional()
    }),
 });
+const updateChangeApprovalStatusBlog = z.object({
+   body: z.object({
+    publishedStatus: z.enum(["APPROVED","CANCEL"]).optional()
+   
+   }),
+});
 
 
 
 
 export const blogValidationSchema = {
-   createBlog,updateBlog
+   createBlog,updateBlog,
+   updateChangeApprovalStatusBlog
 };

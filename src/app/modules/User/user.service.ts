@@ -87,23 +87,20 @@ const createModarator = async (payload: any) => {
 const createSubscriber = async (payload: any) => {
   const { password, ...subscriber } = payload;
 
-  
-
   const hashPassword = await hashedPassword(password);
-  console.log(hashPassword,subscriber)
+  console.log(hashPassword, subscriber);
 
   const result = await prisma.$transaction(async (transactionClient) => {
-    const userCreate= await transactionClient.user.create({
+    const userCreate = await transactionClient.user.create({
       data: {
+        name: subscriber.name,
         email: subscriber.email,
         password: hashPassword,
         role: UserRole.SUBSCRIBER,
       },
     });
 
-    console.log({userCreate})
-
-  
+    console.log({ userCreate });
 
     const newSubscriber = await transactionClient.subscriber.create({
       data: subscriber,
@@ -218,6 +215,8 @@ const updateMyProfile = async (authUser: any, payload: any) => {
       status: UserStatus.ACTIVE,
     },
   });
+
+  console.log(userData,payload)
 
   let profileData;
   if (userData?.role === UserRole.ADMIN) {

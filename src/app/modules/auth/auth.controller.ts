@@ -27,6 +27,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
    const { refreshToken } = req.cookies;
+   console.log(refreshToken,'refreshToken')
 
    const result = await authServices.refreshToken(refreshToken);
 
@@ -49,7 +50,10 @@ const changePassword = catchAsync(
          statusCode: httpStatus.OK,
          success: true,
          message: 'Password changed successfully!',
-         data: result,
+         data: {
+            status: 200,
+            message: 'Password changed successfully!',
+          },
       });
    }
 );
@@ -61,20 +65,44 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
       statusCode: httpStatus.OK,
       success: true,
       message: 'Check your email to reset your password',
-      data: null,
+      data: {
+         status: 200,
+         message: 'Check your email for reset link!',
+       },
    });
 });
 
-const resetPassword = catchAsync(async (req: Request, res: Response) => {
-   const token = req.headers.authorization || '';
+// const resetPassword = catchAsync(async (req: Request, res: Response) => {
+//    const token = req.headers.authorization || '';
+//    console.log({token})
 
-   const result = await authServices.resetPassword(token, req.body);
+//    const result = await authServices.resetPassword(token, req.body);
+
+//    sendResponse(res, {
+//       statusCode: httpStatus.OK,
+//       success: true,
+//       message: 'Password reset successfully!',
+//       data: {
+//          status: 200,
+//          message: 'Password Reset Successfully',
+//        },
+//    });
+// });
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+
+   const token = req.headers.authorization || "";
+   console.log({token})
+   await authServices.resetPassword(req.body, token);
 
    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Password reset successfully!',
-      data: result,
+       statusCode: 200,
+       success: true,
+       message: "Account recovered!",
+       data: {
+           status: 200,
+           message: 'Password Reset Successfully',
+         },
    });
 });
 

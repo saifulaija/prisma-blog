@@ -65,7 +65,8 @@ const getSingleBlog = catchAsync(async (req: Request & {user?:any}, res: Respons
 const getMyAllBlogs = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
     const user = req.user;
-    const userId=req.params.userId as string;
+    console.log(user)
+  
 
     const validQueryParams = filterValidQueryParams(req.query, blogValidParams);
     const paginationAndSortingQueryParams = filterValidQueryParams(
@@ -77,7 +78,7 @@ const getMyAllBlogs = catchAsync(
       validQueryParams,
       paginationAndSortingQueryParams,
       user,
-      userId
+      
     );
 
     sendResponse(res, {
@@ -111,6 +112,28 @@ const updateBlog = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const changeApprovalStatusBlog = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await blogServicres.changeApprovalStatusDB(id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Approval status  updated successfully!",
+    data: result,
+  });
+});
+const getSingleBlogBYModerator = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await blogServicres.getSingleBlogBYModerator(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Blog fetched successfully!",
+    data: result,
+  });
+});
 
 
 export const blogController = {
@@ -120,5 +143,7 @@ export const blogController = {
   getMyAllBlogs,
   deleteBlog,
   updateBlog,
+  changeApprovalStatusBlog,
+  getSingleBlogBYModerator
  
 };
