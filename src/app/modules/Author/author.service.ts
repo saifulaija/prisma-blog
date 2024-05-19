@@ -76,24 +76,62 @@ const getSingleAuthorFromDB = async (id: string) => {
    });
 };
 
+// const updateAuthorIntoDB = async (
+//    id: string,
+//    data: Partial<Author>
+// ): Promise<Author> => {
+//    await prisma.author.findUniqueOrThrow({
+//       where: {
+//          id,
+//          isDeleted: false,
+//       },
+//    });
+
+//    return await prisma.author.update({
+//       where: {
+//          id,
+//       },
+//       data,
+//    });
+// };
+
+
+
 const updateAuthorIntoDB = async (
    id: string,
    data: Partial<Author>
-): Promise<Author> => {
-   await prisma.author.findUniqueOrThrow({
-      where: {
-         id,
-         isDeleted: false,
-      },
+ ): Promise<Author> => {
+   const authorData = await prisma.author.findUniqueOrThrow({
+     where: {
+       id,
+       isDeleted: false,
+     },
    });
-
-   return await prisma.author.update({
-      where: {
+ 
+   const result = await prisma.$transaction(async (tx) => {
+     const updatedModerator = await tx.author.update({
+       where: {
          id,
-      },
-      data,
+       },
+       data,
+     });
+ 
+     if (data.profilePhoto) {
+       await tx.user.update({
+         where: {
+           email: authorData.email,
+         },
+         data: {
+           profilePhoto: data.profilePhoto,
+         },
+       });
+     }
+ 
+     return updatedModerator;
    });
-};
+ 
+   return result;
+ };
 const deleteAuthorFromDB = async (id: string): Promise<Author> => {
    await prisma.author.findUniqueOrThrow({
       where: {

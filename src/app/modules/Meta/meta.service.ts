@@ -3,6 +3,7 @@ import prisma from "../../../shared/prismaClient";
 import { Published_status, UserRole } from "@prisma/client";
 import { HTTPError } from "../../errors/HTTPError";
 import { VerifiedUser } from "../../interfaces/common";
+import { any } from "zod";
 
 const fetchDashboardMetadata = async (user: any) => {
   let metadata;
@@ -14,7 +15,7 @@ const fetchDashboardMetadata = async (user: any) => {
       metadata = await getSuperAdminDashboardMetadata();
       break;
     case UserRole.MODERATOR:
-      metadata = await getDoctorDashboardMetadata(user);
+      metadata = await getModeratorDashboardMetadata(user);
       break;
     case UserRole.BLOGGER:
       metadata = await getBloggerDashboardMetadata(user);
@@ -30,14 +31,63 @@ const getAdminDashboardMetadata = async () => {
   const blogCount = await prisma.blog.count();
   const bloggerCount = await prisma.author.count();
   const adminCount = await prisma.admin.count();
+
   const commentCount = await prisma.comment.count();
   const likeCount = await prisma.like.count();
   const moderatorCount = await prisma.moderator.count();
+  const pendingBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.PENDING
+    }
+  })
+  const approvedBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.APPROVED
+    }
+  })
+  const cancelBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.CANCEL
+    }
+  })
 
   const barChartData = await getBarChartData();
   const pieChartData = await getPieChartData();
 
-  return { blogCount, bloggerCount, adminCount, commentCount, likeCount };
+  return { blogCount, bloggerCount, adminCount, commentCount, likeCount,pendingBlogCount,approvedBlogCount,cancelBlogCount,pieChartData,barChartData };
+};
+const getModeratorDashboardMetadata = async (user:VerifiedUser) => {
+  await prisma.user.findUniqueOrThrow({
+    where:{
+      email:user?.email
+    }
+  })
+  const bloggerCount = await prisma.author.count();
+  const blogCount = await prisma.blog.count();
+  const moderatorCount = await prisma.moderator.count();
+  const pendingBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.PENDING
+    }
+  })
+  const approvedBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.APPROVED
+    }
+  })
+  const cancelBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.CANCEL
+    }
+  })
+
+  const commentCount = await prisma.comment.count();
+  const likeCount = await prisma.like.count();
+
+  const barChartData = await getBarChartData();
+  const pieChartData = await getPieChartData();
+
+  return { blogCount, bloggerCount,  commentCount, likeCount,moderatorCount,pendingBlogCount,approvedBlogCount,cancelBlogCount,barChartData };
 };
 
 const getSuperAdminDashboardMetadata = async () => {
@@ -103,8 +153,10 @@ const getBloggerDashboardMetadata = async (user: VerifiedUser) => {
   });
 
   const totalViews = viewCount._sum?.views || 0;
+  const barChartData = await getBarChartData();
+  const pieChartData = await getPieChartData();
   return {
-    blogCount,cancelBlogCount,approvedBlogCount,pendingBlogCount,commentCount,totalViews
+    blogCount,cancelBlogCount,approvedBlogCount,pendingBlogCount,commentCount,totalViews,barChartData, pieChartData
   };
 };
 
@@ -114,29 +166,29 @@ const getBloggerDashboardMetadata = async (user: VerifiedUser) => {
 const getBarChartData = async () => {
   const appointmentCountByMonth: { month: Date; count: bigint }[] =
     await prisma.$queryRaw`
-        SELECT DATE_TRUNC('month', "createdAt") AS month,
+        SELECT DATE_TRUNC('day', "createdAt") AS day,
                COUNT(*) AS count
-        FROM "appointments"
-        GROUP BY month
-        ORDER BY month ASC
+        FROM "blogs"
+        GROUP BY day
+        ORDER BY day ASC
     `;
 
-  const formattedMetadata = appointmentCountByMonth.map(({ month, count }) => ({
-    month,
+  const formattedMetadata = appointmentCountByMonth.map(({ day, count }) => ({
+    day,
     count: Number(count), // Convert BigInt to integer
   }));
   return formattedMetadata;
 };
 
 const getPieChartData = async () => {
-  const appointmentStatusDistribution = await prisma.appointment.groupBy({
-    by: ["status"],
+  const appointmentStatusDistribution = await prisma.blog.groupBy({
+    by: ["id"],
     _count: { id: true },
   });
 
   const formattedData = appointmentStatusDistribution.map(
-    ({ status, _count }) => ({
-      status,
+    ({ id, _count }) => ({
+      id,
       count: Number(_count.id), // Convert BigInt to integer
     })
   );

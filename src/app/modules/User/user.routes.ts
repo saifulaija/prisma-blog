@@ -40,7 +40,7 @@ validateRequest(userValidationSchema.createAdminSchema),
 router.post('/create-author',
 //  authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),validateRequest(userValidationSchema.createAuthorSchema), 
 userController.createAuthor)
-router.post('/create-modarator', 
+router.post('/create-moderator', 
 
 // authGuard(UserRole.ADMIN,UserRole.SUPER_ADMIN),
 

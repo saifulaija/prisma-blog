@@ -89,12 +89,16 @@ const getAllCommentsFromDB=async(blogId:string)=>{
       blogId:blogId
     },
     include:{
-      comment:true
+      comment:true,
+      
     },
     orderBy:{
       createdAt:'asc'
     }
-  })
+    
+  },
+  
+)
  return result
 }
 
