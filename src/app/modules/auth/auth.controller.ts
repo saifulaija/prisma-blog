@@ -72,39 +72,39 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
    });
 });
 
-// const resetPassword = catchAsync(async (req: Request, res: Response) => {
-//    const token = req.headers.authorization || '';
-//    console.log({token})
-
-//    const result = await authServices.resetPassword(token, req.body);
-
-//    sendResponse(res, {
-//       statusCode: httpStatus.OK,
-//       success: true,
-//       message: 'Password reset successfully!',
-//       data: {
-//          status: 200,
-//          message: 'Password Reset Successfully',
-//        },
-//    });
-// });
-
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-
-   const token = req.headers.authorization || "";
+   const token = req.headers.authorization || '';
    console.log({token})
-   await authServices.resetPassword(req.body, token);
+
+   const result = await authServices.resetPassword(req.body,token);
 
    sendResponse(res, {
-       statusCode: 200,
-       success: true,
-       message: "Account recovered!",
-       data: {
-           status: 200,
-           message: 'Password Reset Successfully',
-         },
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Password reset successfully!',
+      data: {
+         status: 200,
+         message: 'Password Reset Successfully',
+       },
    });
 });
+
+// const resetPassword = catchAsync(async (req: Request, res: Response) => {
+
+//    const token = req.headers.authorization || "";
+//    console.log({token})
+//    await authServices.resetPassword(req.body, token);
+
+//    sendResponse(res, {
+//        statusCode: 200,
+//        success: true,
+//        message: "Account recovered!",
+//        data: {
+//            status: 200,
+//            message: 'Password Reset Successfully',
+//          },
+//    });
+// });
 
 export const authController = {
    loginUser,

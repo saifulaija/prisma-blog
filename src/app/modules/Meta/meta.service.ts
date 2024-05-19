@@ -56,6 +56,36 @@ const getAdminDashboardMetadata = async () => {
 
   return { blogCount, bloggerCount, adminCount, commentCount, likeCount,pendingBlogCount,approvedBlogCount,cancelBlogCount,pieChartData,barChartData };
 };
+const getSuperAdminDashboardMetadata = async () => {
+  const blogCount = await prisma.blog.count();
+  const bloggerCount = await prisma.author.count();
+  const adminCount = await prisma.admin.count();
+  const userCount=await prisma.user.count()
+
+  const commentCount = await prisma.comment.count();
+  const likeCount = await prisma.like.count();
+  const moderatorCount = await prisma.moderator.count();
+  const pendingBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.PENDING
+    }
+  })
+  const approvedBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.APPROVED
+    }
+  })
+  const cancelBlogCount= await prisma.blog.count({
+    where:{
+      publishedStatus:Published_status.CANCEL
+    }
+  })
+
+  const barChartData = await getBarChartData();
+  const pieChartData = await getPieChartData();
+
+  return { blogCount, bloggerCount, adminCount, commentCount, likeCount,pendingBlogCount,approvedBlogCount,cancelBlogCount,pieChartData,barChartData,userCount,moderatorCount };
+};
 const getModeratorDashboardMetadata = async (user:VerifiedUser) => {
   await prisma.user.findUniqueOrThrow({
     where:{
@@ -90,19 +120,7 @@ const getModeratorDashboardMetadata = async (user:VerifiedUser) => {
   return { blogCount, bloggerCount,  commentCount, likeCount,moderatorCount,pendingBlogCount,approvedBlogCount,cancelBlogCount,barChartData };
 };
 
-const getSuperAdminDashboardMetadata = async () => {
-  // const appointmentCount = await prisma.appointment.count();
-  // const patientCount = await prisma.patient.count();
-  // const doctorCount = await prisma.doctor.count();
-  // const adminCount = await prisma.admin.count();
-  // const paymentCount = await prisma.payment.count();
-  // const totalRevenue = await prisma.payment.aggregate({
-  //     _sum: { amount: true }
-  // });
-  // const barChartData = await getBarChartData();
-  // const pieChartData = await getPieChartData();
-  // return { appointmentCount, patientCount, doctorCount, adminCount, paymentCount, totalRevenue, barChartData, pieChartData };
-};
+
 
 const getBloggerDashboardMetadata = async (user: VerifiedUser) => {
   const blogger = await prisma.author.findUnique({

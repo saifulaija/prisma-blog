@@ -23,10 +23,12 @@ const seedSuperAdmin = async () => {
         name: "sobuj sorker",
         password: newPassword,
         role: UserRole.SUPER_ADMIN,
+    
         admin: {
           create: {
             name: "sobuj sorker",
             contactNumber: "01717722085",
+          profilePhoto:'https://i.ibb.co/6vFL1kB/super-Admin.jpg'
     
           },
         },

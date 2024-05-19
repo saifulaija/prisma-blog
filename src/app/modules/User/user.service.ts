@@ -26,6 +26,7 @@ const createAdmin = async (payload: any) => {
         email: admin.email,
         password: hashPassword,
         role: UserRole.ADMIN,
+        name:admin.name
       },
     });
     console.log({ newUser });
@@ -49,6 +50,7 @@ const createAuthor = async (payload: any) => {
         email: author.email,
         password: hashPassword,
         role: UserRole.BLOGGER,
+        name:author.name
       },
     });
 
@@ -72,6 +74,7 @@ const createModarator = async (payload: any) => {
         email: modarator.email,
         password: hashPassword,
         role: UserRole.MODERATOR,
+        name:modarator.name
       },
     });
 
@@ -128,9 +131,9 @@ const getAllUsersFromDb = async (
   const conditions: Prisma.UserWhereInput[] = [];
 
   // filtering out the soft deleted users
-  conditions.push({
-    status: UserStatus.ACTIVE,
-  });
+  // conditions.push({
+  //   status: UserStatus.ACTIVE,
+  // });
 
   //@ searching
   if (q) {
@@ -258,7 +261,7 @@ const changeProfileStatus = async (userId: string, status: UserStatus) => {
     where: {
       id: userId,
     },
-    data: status,
+    data:status,
   });
 
   return updatedUser;
